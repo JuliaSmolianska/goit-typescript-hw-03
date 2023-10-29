@@ -1,55 +1,64 @@
 class Key {
-  constructor() {}
+  private signature: number;
 
-  getKey(): Key {
-    return this;
-  }
-}
-
-class MyHouse {
-  private key: Key;
-  private isDoorOpen: boolean;
-
-  constructor(key: Key) {
-    this.key = key;
-    this.isDoorOpen = false;
+  constructor() {
+    this.signature = Math.random();
   }
 
-  openDoor(personKey: Key) {
-    if (personKey === this.key) {
-      this.isDoorOpen = true;
-      console.log("The door is open");
-    } else {
-      console.log("The key does not valid!");
-    }
-  }
-
-  comeIn(person: Person) {
-    if (this.isDoorOpen) {
-      console.log(`${person.getName()}, you are inside the house.`);
-    } else {
-      console.log("Firstly you need to open the door");
-    }
+  getSignature(): number {
+    return this.signature;
   }
 }
 
 class Person {
   private key: Key;
-  private name: string;
 
-  constructor(key: Key, name: string = "Tonny Tim") {
+  constructor(key: Key) {
     this.key = key;
-    this.name = name;
-  }
-
-  getName(): string {
-    return this.name;
   }
 
   getKey(): Key {
     return this.key;
   }
 }
+
+abstract class House {
+  protected door: boolean = false;
+  public key: Key;
+  public tenants: Person[] = [];
+
+  comeIn(person: Person) {
+    if (this.door) {
+      this.tenants.push(person);
+      console.log(
+        `${person.getKey().getSignature()} you are inside the house.`
+      );
+      return;
+    }
+
+    console.log("The door is closed");
+  }
+
+  abstract openDoor(key: Key): void;
+}
+
+class MyHouse extends House {
+  constructor(key: Key) {
+    super();
+    this.key = key;
+  }
+
+  openDoor(key: Key): void {
+    if (key.getSignature() === this.key.getSignature()) {
+      this.door = true;
+      console.log("The door is open");
+      return;
+    }
+
+    console.log("The door is closed");
+  }
+}
+
 const key = new Key();
 
 const house = new MyHouse(key);
